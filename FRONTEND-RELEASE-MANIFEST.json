@@ -1,0 +1,67 @@
+{
+  "release_name": "Science Point Assam \u2014 GitHub Pages Production Split-Origin Frontend",
+  "version": "FINAL-PRODUCTION-SPLIT-ORIGIN-AUDITED-V3",
+  "generated_at": "2026-10-02",
+  "file_count": 11,
+  "api_origin": "https://api.sciencepointassam.com",
+  "frontend_origin": "https://app.sciencepointassam.com",
+  "hosting": "GitHub Pages",
+  "manifest_excludes_itself": true,
+  "files": [
+    {
+      "path": "404.html",
+      "sha256": "d1bfd239f21bded31535c31db5d97a49e773ca7175ff9fe04d27e30f709becb7",
+      "size_bytes": 1113
+    },
+    {
+      "path": "CNAME",
+      "sha256": "01ba3c67d60c676b575e1cdc413bb8a04ce8365c172d1583bc83f5bb2b736de7",
+      "size_bytes": 26
+    },
+    {
+      "path": "README.md",
+      "sha256": "ad010f28b2d44ec1462b6e659f40572911a2adb7ba7c93afd6f609f6b8b4f864",
+      "size_bytes": 2006
+    },
+    {
+      "path": "app.js",
+      "sha256": "b0f7f3e1533ee3d19999eb8de0e6073be0765ee3ad77ea72e20b4135e920b2db",
+      "size_bytes": 141181
+    },
+    {
+      "path": "config.js",
+      "sha256": "aeb22ee1b62397b37ae40f0fbbb879226034477ac74cb23b5ff79beffe313160",
+      "size_bytes": 92
+    },
+    {
+      "path": "docs/BACKEND-FRONTEND-CONTRACT.md",
+      "sha256": "9c22c0aa07079d86d6269dc671b209ee6772ba0c45d31511b370ab8c924a1c0c",
+      "size_bytes": 1543
+    },
+    {
+      "path": "index.html",
+      "sha256": "d1bfd239f21bded31535c31db5d97a49e773ca7175ff9fe04d27e30f709becb7",
+      "size_bytes": 1113
+    },
+    {
+      "path": "robots.txt",
+      "sha256": "eb6b0af97fb27859357424da40844399994de5188d47859e617171c23affea52",
+      "size_bytes": 59
+    },
+    {
+      "path": "site.webmanifest",
+      "sha256": "14db8e7a8dc7db2457211b623c3dd087701144a4eae64e948760498b60c01fae",
+      "size_bytes": 273
+    },
+    {
+      "path": "styles.css",
+      "sha256": "898c8785b89d159835a950a049ce8c28f6206663a3905ef26d0a18bb4d4e283a",
+      "size_bytes": 15361
+    },
+    {
+      "path": "tests/frontend-static-check.mjs",
+      "sha256": "95e12b44d7f5ad0921adf554370fb46d6704638ead8e01a6cdc8ec8483f36563",
+      "size_bytes": 6183
+    }
+  ]
+}
