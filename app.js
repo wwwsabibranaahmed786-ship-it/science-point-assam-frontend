@@ -111,7 +111,7 @@
     root.innerHTML = loading();
     try {
       if (state.route.startsWith("/student") && !state.student) return navigate(`/login?next=${encodeURIComponent(state.route)}`,true);
-      if (state.route.startsWith("/admin") && !state.admin) return navigate(`/admin-login?next=${encodeURIComponent(state.route)}`,true);
+      if ((state.route === "/admin" || state.route.startsWith("/admin/")) && !state.admin) return navigate(`/admin-login?next=${encodeURIComponent(state.route)}`,true);
       let html;
       if (state.route==="/") html=await home();
       else if (state.route==="/courses") html=await courses();
