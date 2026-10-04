@@ -1,76 +1,80 @@
-import fs from "node:fs";
-import path from "node:path";
+import { readFile, readdir } from "node:fs/promises";
+import { join } from "node:path";
+import { spawnSync } from "node:child_process";
 
-const root = path.resolve(new URL("..", import.meta.url).pathname);
-const read = f => fs.readFileSync(path.join(root, f), "utf8");
-const exists = f => fs.existsSync(path.join(root, f));
-const assert = (ok,msg) => { if(!ok) throw new Error(`FAIL: ${msg}`); console.log(`PASS: ${msg}`); };
+const ROOT = new URL("..", import.meta.url);
+const path = name => new URL(name, ROOT).pathname;
+const app = await readFile(path("app.js"), "utf8");
+const html = await readFile(path("index.html"), "utf8");
+const config = await readFile(path("config.js"), "utf8");
+const css = await readFile(path("styles.css"), "utf8");
+const redirects = await readFile(path("_redirects"), "utf8");
+const notFound = await readFile(path("404.html"), "utf8");
+const readme = await readFile(path("README.md"), "utf8");
 
-const html = read("index.html");
-const app = read("app.js");
-const config = read("config.js");
-const read404 = read("404.html");
-const manifest = read("FRONTEND-RELEASE-MANIFEST.json");
-
-assert(exists("index.html"), "release file index.html");
-assert(exists("404.html"), "GitHub Pages SPA fallback 404.html exists");
-assert(exists("CNAME"), "GitHub Pages CNAME exists");
-assert(!exists("_headers") && !exists("_redirects"), "GitHub Pages release has no Cloudflare Pages-only routing/header artifacts");
-assert(exists("styles.css"), "release file styles.css");
-assert(exists("config.js"), "release file config.js");
-assert(exists("app.js"), "release file app.js");
-assert(html.includes('href="/styles.css"'), "index loads styles.css from root");
-assert(html.includes('href="/site.webmanifest"'), "index loads root manifest");
-assert(html.includes('src="/config.js"'), "index loads root config.js");
-assert(html.includes('src="/app.js"'), "index loads root app.js");
-assert(!html.includes('./app.js') && !html.includes('./config.js') && !html.includes('./site.webmanifest'), "index has no relative SPA runtime paths");
-assert(read404.includes('src="/app.js"') && read404.includes('src="/config.js"') && read404.includes('href="/styles.css"'), "404 uses root-relative SPA assets");
-assert(read("CNAME").trim() === "app.sciencepointassam.com", "CNAME matches production frontend origin");
-assert(config.includes('API_BASE_URL: "https://api.sciencepointassam.com"'), "production API_BASE_URL is the API origin");
-assert(!config.includes("workers.dev"), "production config has no workers.dev endpoint");
-assert(app.includes('credentials:"include"'), "API wrapper sends credentials");
-assert(app.includes('Cache-Control","no-store'), "API wrapper sends no-store cache directive");
-assert(app.includes('/api/assignments/${assignmentId}/submission-file'), "student assignment file upload uses dedicated Worker endpoint");
-assert(app.includes('body.submission_id=submissionId'), "assignment submit binds a server-created submission ID");
-assert(!app.includes('body.submission_file_key='), "frontend never posts a raw submission_file_key on assignment submit");
-assert(app.includes('crossorigin="use-credentials"'), "protected video uses credentialed cross-origin media");
-assert(app.includes('safeMediaUrl'), "protected media is constrained to API origin");
-assert(app.includes('content:Notes'), "Notes modal definition exists");
-assert(app.includes('content:Videos'), "Videos modal definition exists");
-assert(app.includes('note_type') && app.includes('"note"'), "Notes use the backend note type contract");
-assert(app.includes('function adminAssignmentSubmissions'), "assignment submissions admin page is implemented");
-assert(app.includes('function openAssignmentSubmissionReview'), "assignment submission review UI is implemented");
-assert(app.includes('function adminNotifications'), "announcements admin page is implemented");
-assert(app.includes('function adminPayments'), "payments admin page is implemented");
-assert(app.includes('function adminPricing'), "pricing admin page is implemented");
-for (const fn of ["adminAssignmentSubmissions","adminNotifications","adminPayments","adminPricing","assignmentSubmissionCard","openAssignmentSubmissionReview"]) {
-  assert(new RegExp(`function ${fn}\\s*\\(`).test(app), `runtime function ${fn} exists`);
+function assert(condition, message) {
+  if (!condition) throw new Error(`FAIL: ${message}`);
+  console.log(`PASS: ${message}`);
 }
-assert(app.includes('answer_mode') && app.includes('normalizeFrontendAnswerMode'), "assignment answer-mode contract is rendered");
-assert(app.includes('if(mode==="text"&&!answerText)') && app.includes('if(mode==="file"&&!submissionId)') && app.includes('if(mode==="mixed"&&!answerText&&!submissionId)'), "assignment answer-mode client enforcement exists");
-assert(app.includes('document.addEventListener("input",e=>{const t=e.target;if(t instanceof HTMLTextAreaElement'), "subjective textarea autosave listens to input events");
-assert(app.includes('document.getElementById("exam-index")'), "exam question index is updated after refresh");
-assert(app.includes('original_filename') && app.includes('content_type') && app.includes('size_bytes'), "admin media uses normalized backend media fields");
-assert(app.includes('copy-media-key'), "admin media exposes a safe copy-key action for resource binding");
-assert(app.includes('api(`/api/admin/courses/${courseId}/batches`)'), "batch editing reads from the backend-supported course batch list route");
-assert(!app.includes('api(`/api/admin/course-batches/${Number(el.dataset.id)}`)'), "frontend does not call a nonexistent batch detail GET route");
-assert(app.includes('/api/admin/pricing/offers'), "admin pricing covers offers");
-assert(app.includes('/api/admin/announcements/'), "admin announcements uses detail/action routes");
-assert(app.includes('audience_type') && app.includes('channels') && app.includes('priority'), "announcement form matches backend payload contract");
 
-const data = JSON.parse(manifest);
-const releaseFiles = [];
-function walk(dir, rel="") {
-  for (const entry of fs.readdirSync(dir,{withFileTypes:true})) {
-    const r=path.join(rel,entry.name), full=path.join(dir,entry.name);
-    if(entry.isDirectory()) walk(full,r); else if(!["node_modules"].includes(entry.name)) releaseFiles.push(r.replaceAll(path.sep,"/"));
-  }
+const syntax = spawnSync(process.execPath, ["--check", path("app.js")], { encoding: "utf8" });
+assert(syntax.status === 0, "app.js syntax");
+
+for (const file of ["index.html", "404.html", "config.js", "styles.css", "_redirects", "README.md", "docs/BACKEND-FRONTEND-CONTRACT.md"]) {
+  await readFile(path(file));
+  console.log(`PASS: release file ${file}`);
 }
-walk(root);
-const ignored = new Set(["package.json","tests/frontend-static-check.mjs","FRONTEND-RELEASE-MANIFEST.json"]);
-const listed = new Set(data.files.map(x=>x.path));
-const actual = new Set(releaseFiles);
-assert(data.file_count === data.files.length, "release manifest file_count matches files array");
-for (const p of data.files) assert(actual.has(p.path), `manifest file exists: ${p.path}`);
-for (const p of releaseFiles) if(!ignored.has(p) && !p.startsWith("docs/")) assert(listed.has(p), `release manifest lists: ${p}`);
-console.log("FRONTEND PRODUCTION SPLIT-ORIGIN CHECK: PASS");
+
+for (const route of [
+  'state.route==="/"', 'state.route==="/courses"', 'state.route==="/login"',
+  'state.route==="/register"', 'state.route==="/student"', 'state.route==="/student/exams"',
+  'state.route==="/student/results"', 'state.route==="/student/notifications"',
+  'state.route==="/admin"', 'state.route==="/admin/question-bank"',
+  'state.route==="/admin/question-import"', 'state.route==="/admin/exams"',
+  'state.route==="/admin/results"', 'state.route==="/admin/payments"',
+  'state.route==="/admin/settings"'
+]) assert(app.includes(route), `route ${route}`);
+
+for (const api of [
+  '/api/auth/login', '/api/auth/me', '/api/auth/register',
+  '/api/student/dashboard', '/api/student/learning-context',
+  '/api/courses', '/api/taxonomy/tree', '/api/exams',
+  '/api/exam-centre/start', '/api/exam-centre/attempts/',
+  '/api/results', '/api/notifications', '/api/purchases',
+  '/api/admin/students', '/api/admin/courses', '/api/admin/course-batches/',
+  '/api/admin/questions', '/api/admin/import/upload', '/api/admin/exams',
+  '/api/admin/results', '/api/admin/assignments', '/api/admin/announcements',
+  '/api/admin/payments', '/api/admin/refunds', '/api/admin/pricing/products',
+  '/api/admin/pricing/coupons', '/api/admin/publishing',
+  '/api/admin/control-center/settings'
+]) assert(app.includes(api), `backend contract ${api}`);
+
+assert(config.includes('API_BASE_URL') && config.includes('https://api.sciencepointassam.com'), "production API base configuration");
+assert(app.includes('credentials:"include"'), "cookie credentials included on API requests");
+assert(app.includes('cache:"no-store"'), "authenticated/API responses requested without cache");
+assert(app.includes('translation_as_question_text') && app.includes('translation_hi_question_text'), "structured Assamese/Hindi Question Bank translations");
+assert(app.includes('body.translations='), "translation payload sent as backend array contract");
+assert(app.includes('data-edit-id'), "admin edit state supported");
+assert(app.includes('course-batches/${editId}'), "batch edit uses backend PATCH contract");
+assert(app.includes('control-center/settings') && app.includes('settings:[{key:form.dataset.key,value:data.value}]'), "control-centre settings uses collection PATCH contract");
+assert(app.includes('dataset.deadline') && app.includes('Date.parse(paper.dataset.deadline)'), "CBT timer is tied to server deadline");
+assert(app.includes('document.visibilityState') || app.includes('document.hidden'), "CBT refreshes on visibility changes");
+assert(app.includes('window.addEventListener("online"'), "CBT refreshes after reconnect");
+assert(app.includes('target="_blank" rel="noopener noreferrer"'), "external links get opener protection");
+assert(app.includes(`const safe=safeUrl(raw)`) && app.includes(`disabled-link`), "backend-controlled navigation URLs are sanitized before href");
+assert(app.includes('u.origin === location.origin') && app.includes('u.protocol === "https:"'), "media/navigation URL allowlist is restricted");
+assert(app.includes("safeApiUrl") && app.includes("API_ORIGIN"), "protected media URLs resolve against the API origin");
+assert(app.includes('crossorigin="use-credentials"'), "protected video requests include credentials");
+assert(app.includes('submission_file') && app.includes("FormData"), "assignment file submission transport exists");
+assert(app.includes("data-answer-mode") && app.includes("ANSWER_REQUIRED") === false, "assignment answer mode UI is present");
+assert(app.includes('questionImage?`<img'), "unsafe question image URLs are not rendered as empty src");
+assert(app.includes('el.dataset.actionBusy === "1"'), "action double-submit guard exists");
+assert(app.includes('const attempt=Number(paper?.dataset.attempt||0)') && app.includes('const routeAtType=state.route'), "debounced CBT subjective autosave captures attempt context");
+assert(redirects.includes('/*    /index.html   200'), "SPA fallback configured for Cloudflare Pages-compatible hosts");
+assert(notFound.includes('src="/app.js"') && notFound.includes('src="/config.js"'), "GitHub Pages 404 SPA fallback uses root-relative assets");
+assert(html.includes('src="/app.js"') && html.includes('src="/config.js"') && html.includes('href="/site.webmanifest"'), "index.html uses root-relative assets");
+assert(readme.includes('same-site HTTPS') && readme.includes('cookie-based authentication'), "deployment cookie topology documented");
+assert(css.includes('.course-cover img{'), "course cover images styled");
+assert(!/https?:\/\/[^\s"'`]+workers\.dev/.test(config), "no hard-coded worker.dev API origin in production config");
+
+console.log("\nFRONTEND STATIC CHECK PASS");

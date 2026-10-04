@@ -1,67 +1,77 @@
 {
-  "release_name": "Science Point Assam \u2014 GitHub Pages Production Split-Origin Frontend",
-  "version": "FINAL-PRODUCTION-SPLIT-ORIGIN-AUDITED-V3",
-  "generated_at": "2026-10-02",
-  "file_count": 11,
-  "api_origin": "https://api.sciencepointassam.com",
-  "frontend_origin": "https://app.sciencepointassam.com",
-  "hosting": "GitHub Pages",
-  "manifest_excludes_itself": true,
+  "name": "Science Point Assam Frontend",
+  "version": "FINAL-SPLIT-ORIGIN-DEPLOYMENT",
+  "type": "dependency-free-static-spa",
+  "generated_on": "2026-10-02",
+  "file_count": 12,
   "files": [
     {
       "path": "404.html",
-      "sha256": "d1bfd239f21bded31535c31db5d97a49e773ca7175ff9fe04d27e30f709becb7",
-      "size_bytes": 1113
-    },
-    {
-      "path": "CNAME",
-      "sha256": "01ba3c67d60c676b575e1cdc413bb8a04ce8365c172d1583bc83f5bb2b736de7",
-      "size_bytes": 26
+      "bytes": 1068,
+      "sha256": "041b790119e5a38d0b8f6dae783bf9dda1a1e95c18b6514a7e834db4b41a1d00"
     },
     {
       "path": "README.md",
-      "sha256": "ad010f28b2d44ec1462b6e659f40572911a2adb7ba7c93afd6f609f6b8b4f864",
-      "size_bytes": 2006
+      "bytes": 4225,
+      "sha256": "86d1b8f70d7ffe391a2bc0bdfa5390296b2ae7cd6bdb00a45f57f414fcdaf3c9"
+    },
+    {
+      "path": "_headers",
+      "bytes": 567,
+      "sha256": "b22461ab749786661981e4ff216ff74b5ece92a81e9cd1a709d532dc5844bbd9"
+    },
+    {
+      "path": "_redirects",
+      "bytes": 24,
+      "sha256": "66584af744075248a042165adbdbd6a0551fa708a85650ea1e3e777eee17080c"
     },
     {
       "path": "app.js",
-      "sha256": "b0f7f3e1533ee3d19999eb8de0e6073be0765ee3ad77ea72e20b4135e920b2db",
-      "size_bytes": 141181
+      "bytes": 117946,
+      "sha256": "c038d8f23cc975d904070494989b9661f12836d083db7cb111e9044da109e843"
     },
     {
       "path": "config.js",
-      "sha256": "aeb22ee1b62397b37ae40f0fbbb879226034477ac74cb23b5ff79beffe313160",
-      "size_bytes": 92
+      "bytes": 148,
+      "sha256": "3a4c07a998316aa0a38a36a75087c0e34df66661603eb8bc2b4367403b99a567"
     },
     {
       "path": "docs/BACKEND-FRONTEND-CONTRACT.md",
-      "sha256": "9c22c0aa07079d86d6269dc671b209ee6772ba0c45d31511b370ab8c924a1c0c",
-      "size_bytes": 1543
+      "bytes": 3451,
+      "sha256": "1ca3e82e488eb8039d8568b6d4496b617cea9ea1928bb2a3458a3f21e73d1f50"
     },
     {
       "path": "index.html",
-      "sha256": "d1bfd239f21bded31535c31db5d97a49e773ca7175ff9fe04d27e30f709becb7",
-      "size_bytes": 1113
+      "bytes": 1068,
+      "sha256": "041b790119e5a38d0b8f6dae783bf9dda1a1e95c18b6514a7e834db4b41a1d00"
     },
     {
       "path": "robots.txt",
-      "sha256": "eb6b0af97fb27859357424da40844399994de5188d47859e617171c23affea52",
-      "size_bytes": 59
+      "bytes": 59,
+      "sha256": "eb6b0af97fb27859357424da40844399994de5188d47859e617171c23affea52"
     },
     {
       "path": "site.webmanifest",
-      "sha256": "14db8e7a8dc7db2457211b623c3dd087701144a4eae64e948760498b60c01fae",
-      "size_bytes": 273
+      "bytes": 273,
+      "sha256": "14db8e7a8dc7db2457211b623c3dd087701144a4eae64e948760498b60c01fae"
     },
     {
       "path": "styles.css",
-      "sha256": "898c8785b89d159835a950a049ce8c28f6206663a3905ef26d0a18bb4d4e283a",
-      "size_bytes": 15361
+      "bytes": 15361,
+      "sha256": "898c8785b89d159835a950a049ce8c28f6206663a3905ef26d0a18bb4d4e283a"
     },
     {
       "path": "tests/frontend-static-check.mjs",
-      "sha256": "95e12b44d7f5ad0921adf554370fb46d6704638ead8e01a6cdc8ec8483f36563",
-      "size_bytes": 6183
+      "bytes": 5786,
+      "sha256": "f0b8f31659e94d18914cbe45c694fee73725807a46e141056bb6d21e9a51a8cd"
     }
-  ]
+  ],
+  "verification": {
+    "node_syntax": "PASS",
+    "frontend_static_contract": "PASS",
+    "github_pages_404_fallback_contract": "PASS",
+    "split_origin_media_contract": "PASS",
+    "assignment_file_submission_contract": "PASS",
+    "npm_build": "NOT_APPLICABLE_RELEASE_IS_DEPENDENCY_FREE"
+  }
 }

@@ -1,34 +1,69 @@
-# Backend ↔ Frontend Production Contract
+# Science Point Assam — Backend / Frontend Contract Map
 
-## Origins
+## Authentication
 
-- Frontend: `https://app.sciencepointassam.com`
-- API: `https://api.sciencepointassam.com`
-- Frontend sends credentialed fetches.
+| Frontend capability | Backend route |
+|---|---|
+| Student login | `POST /api/auth/login` |
+| Student logout | `POST /api/auth/logout` |
+| Student session | `GET /api/auth/me` |
+| Student registration | `POST /api/auth/register` |
+| Password reset request | `POST /api/auth/password-reset/request` |
+| Password reset confirmation | `POST /api/auth/password-reset/confirm` |
+| Change password | `POST /api/auth/change-password` |
+| Admin login | `POST /api/admin/login` |
+| Admin logout | `POST /api/admin/logout` |
+| Admin session | `GET /api/admin/me` |
 
-## Media
+## Student learning
 
-Protected media URLs must be API-origin URLs. The frontend rejects a protected media URL whose final origin is not the API origin. Protected video uses `crossorigin="use-credentials"`.
+| Capability | Backend route |
+|---|---|
+| Dashboard | `GET /api/student/dashboard` |
+| Learning context | `GET/PUT /api/student/learning-context` |
+| Enrolled courses | `GET /api/student/courses` |
+| Course detail | `GET /api/courses/:id` |
+| Course batches | `GET /api/courses/:id/batches` |
+| Taxonomy tree | `GET /api/taxonomy/tree` |
+| Notes | `GET /api/notes` and `GET /api/notes/:id` |
+| Open protected note | `POST /api/notes/:id/open` |
+| Videos | `GET /api/videos` and `GET /api/videos/:id` |
+| Start playback | `POST /api/videos/:id/play` |
+| Video progress | `PUT /api/videos/:id/progress` |
+| Assignments | `GET /api/assignments` and `GET /api/assignments/:id` |
+| Assignment submission | `POST /api/assignments/:id/submit` |
 
-## Assignments
+## CBT / results
 
-Student answer modes: `text`, `file`, `mixed`. Legacy `text_or_file` is normalized to `mixed`. Students upload through `/api/assignments/:id/submission-file`; the frontend never posts a raw `submission_file_key` to `/submit`. Submission review uses the admin submission detail endpoint.
+| Capability | Backend route |
+|---|---|
+| Published exams | `GET /api/exams` |
+| Start attempt | `POST /api/exam-centre/start` |
+| Attempt state | `GET /api/exam-centre/attempts/:id` |
+| Save answer | `PUT /api/exam-centre/attempts/:attempt/questions/:question/answer` |
+| Save current question | `PUT /api/exam-centre/attempts/:attempt/progress` |
+| Submit attempt | `POST /api/exam-centre/attempts/:id/submit` |
+| Student results | `GET /api/results` |
+| Result detail | `GET /api/results/:id` |
+| Performance summary | `GET /api/results/performance` |
 
-## Admin content
+The exam UI uses the server-provided `ends_at`/`seconds_remaining` and re-fetches state after reconnect/visibility changes. Browser-local countdown state is not treated as authoritative.
 
-Notes and Videos are opened through the existing `content:Notes` and `content:Videos` modal definitions. Note type is `note` (not `notes`).
+## Admin
 
-## Pricing
+The admin UI follows the backend's centralized services for courses, taxonomy, content, Question Bank, import, exams, results, notifications, payments, pricing, publishing, access and platform control. Server-side authorization remains authoritative even when the frontend hides or disables an action.
 
-Frontend covers pricing products, offers and coupons through their dedicated admin endpoints and state actions.
+## Configuration / cookies
 
-## Notifications
+The backend uses cookie-based sessions. Separate-site frontend/API deployments can break cookie delivery because of SameSite policy. Use same-origin or same-site HTTPS deployment topology and verify it in the browser before production traffic.
 
-Frontend uses the announcement contract (`announcement_type`, `audience_type`, `audience_ids`, `channels`, scheduling, priority 0–100) and the separate validate/materialize/dispatch/state actions.
 
-## GitHub Pages
+## Split-origin production contract
 
-The release contains `404.html`, `CNAME`, and root-relative runtime asset paths. `_redirects` and `_headers` are intentionally not required for the production GitHub Pages path.
-
-## Release manifest
-The frontend release manifest intentionally excludes its own file from the hash list because a self-referential SHA-256 cannot be stable.
+- Frontend origin: `https://app.sciencepointassam.com`
+- API origin: `https://api.sciencepointassam.com`
+- Browser API requests use `credentials: include`.
+- Backend CORS permits only the exact frontend origin for credentialed requests.
+- Browser mutations require the exact frontend `Origin`; payment provider webhooks are server-to-server and are exempt from this browser-origin gate while retaining provider signature verification and webhook idempotency.
+- Protected media URLs are API-origin URLs and are consumed with session credentials.
+- Assignment submissions may contain text, a validated document file, or both according to the server-owned `answer_mode`.
